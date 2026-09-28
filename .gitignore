@@ -1,0 +1,3 @@
+*.exe
+/neighbium-mcp
+.env
