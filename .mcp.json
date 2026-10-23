@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "neighbium": {
+      "type": "stdio",
+      "command": "go",
+      "args": ["run", "."],
+      "cwd": "/Users/samriddhibharadwaj/Documents/School/neighbium-mcp"
+    }
+  }
+}

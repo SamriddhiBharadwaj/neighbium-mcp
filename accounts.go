@@ -1,12 +1,8 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-	"time"
-)
+import "encoding/json"
 
-func buildGetBalanceSheetResponse(societyID int, asOnDate string, apiBody []byte) (map[string]any, error) {
+func buildGetBalanceSheetResponse(societyID int, asOnDate int64, apiBody []byte) (map[string]any, error) {
 	var apiData map[string]any
 	err := json.Unmarshal(apiBody, &apiData)
 	if err != nil {
@@ -21,14 +17,14 @@ func buildGetBalanceSheetResponse(societyID int, asOnDate string, apiBody []byte
 	return apiData, nil
 }
 
-func buildGetLedgersResponse(societyID int, apiBody []byte) (GetLedgersResponse, error) {
+func buildGetLedgersBalanceResponse(societyID int, apiBody []byte) (GetLedgersBalanceResponse, error) {
 	data, err := extractDataField(apiBody)
 	if err != nil {
-		return GetLedgersResponse{}, err
+		return GetLedgersBalanceResponse{}, err
 	}
 
-	return GetLedgersResponse{
-		Tool:      "get_ledgers",
+	return GetLedgersBalanceResponse{
+		Tool:      "get_ledgers_balance",
 		Status:    "success",
 		SocietyID: societyID,
 		Data:      data,
@@ -55,29 +51,14 @@ func extractDataField(apiBody []byte) (any, error) {
 	return asArray, nil
 }
 
-func currentAsOn(now time.Time) (int64, string) {
-	asOn := toUnixMillis(now)
-	asOnDate := now.Format("2006-01-02")
-	return asOn, asOnDate
-}
-
-func dateUnixMillis(date string) (int64, error) {
-	parsed, err := time.Parse("2006-01-02", date)
-	if err != nil {
-		return 0, fmt.Errorf("invalid date %q: expected YYYY-MM-DD", date)
-	}
-
-	return toUnixMillis(parsed), nil
-}
-
-func buildGetIncomeAndExpenditureResponse(societyID int, fromDate string, toDate string, apiBody []byte) (map[string]any, error) {
+func buildGetIncomeAndExpenditureResponse(societyID int, fromDate int64, toDate int64, apiBody []byte) (map[string]any, error) {
 	var apiData map[string]any
 	if err := json.Unmarshal(apiBody, &apiData); err != nil {
 		return nil, err
 	}
 
 	apiData["societyId"] = societyID
-	apiData["period"] = map[string]string{
+	apiData["period"] = map[string]int64{
 		"startDate": fromDate,
 		"endDate":   toDate,
 	}

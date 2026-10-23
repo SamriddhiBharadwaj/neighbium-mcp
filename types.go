@@ -79,7 +79,7 @@ type SimpleFlat struct {
 	RelationshipType string `json:"relationshipType"`
 }
 
-type GetLedgersResponse struct {
+type GetLedgersBalanceResponse struct {
 	Tool      string `json:"tool"`
 	Status    string `json:"status"`
 	SocietyID int    `json:"societyId"`

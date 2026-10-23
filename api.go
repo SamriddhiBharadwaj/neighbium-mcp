@@ -6,14 +6,9 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 )
 
 const neighbiumBaseURL = "https://api.neighbium.com/NeighbiumServer/rest"
-
-func toUnixMillis(t time.Time) int64 {
-	return t.UnixMilli()
-}
 
 func neighbiumGet(path string) ([]byte, error) {
 	url := neighbiumBaseURL + path
@@ -65,17 +60,17 @@ func getMemberDirectory(societyID int) ([]DirectoryEntry, error) {
 	return entries, nil
 }
 
-func getBalanceSheet(societyID int, activeUserID int, asOn int64) ([]byte, error) {
-	path := fmt.Sprintf("/societies/%d/accounts/balance-sheet?asOn=%d&activeUserId=%d", societyID, asOn, activeUserID)
+func getBalanceSheet(societyID int, asOn int64) ([]byte, error) {
+	path := fmt.Sprintf("/societies/%d/accounts/balance-sheet?asOn=%d", societyID, asOn)
 	return neighbiumGet(path)
 }
 
-func getLedgers(societyID int, activeUserID int) ([]byte, error) {
-	path := fmt.Sprintf("/societies/%d/accounts/ledgers/balance?financialYear=0&activeUserId=%d", societyID, activeUserID)
+func getLedgersBalance(societyID int, asOnDate int64) ([]byte, error) {
+	path := fmt.Sprintf("/societies/%d/accounts/ledgers/balance?financialYear=0&asOnDate=%d", societyID, asOnDate)
 	return neighbiumGet(path)
 }
 
-func getIncomeAndExpenditure(societyID int, activeUserID int, startDate int64, endDate int64) ([]byte, error) {
-	path := fmt.Sprintf("/societies/%d/accounts/ie?startDate=%d&endDate=%d&activeUserId=%d", societyID, startDate, endDate, activeUserID)
+func getIncomeAndExpenditure(societyID int, startDate int64, endDate int64) ([]byte, error) {
+	path := fmt.Sprintf("/societies/%d/accounts/ie?startDate=%d&endDate=%d", societyID, startDate, endDate)
 	return neighbiumGet(path)
 }

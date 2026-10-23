@@ -38,19 +38,19 @@ func main() {
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        "get_balance_sheet",
-		Description: "Retrieve the society balance sheet as of the current date and time.",
+		Description: "Retrieve the society balance sheet as of a required date and time provided as Unix epoch milliseconds.",
 		Annotations: readOnlyToolAnnotations(),
 	}, handleGetBalanceSheet)
 
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        "get_ledgers",
-		Description: "Retrieve ledger balances for a society.",
+		Name:        "get_ledgers_balance",
+		Description: "Retrieve society ledger balances as of a required date and time provided as Unix epoch milliseconds.",
 		Annotations: readOnlyToolAnnotations(),
-	}, handleGetLedgers)
+	}, handleGetLedgersBalance)
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        "get_income_and_expenditure",
-		Description: "Retrieve society income and expenses for an inclusive date range. Dates are interpreted as UTC.",
+		Description: "Retrieve society income and expenses for an inclusive date range. fromDate and toDate are Unix epoch milliseconds.",
 		Annotations: readOnlyToolAnnotations(),
 	}, handleGetIncomeAndExpenditure)
 

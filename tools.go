@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -20,20 +19,19 @@ type GetMembersInput struct {
 }
 
 type GetBalanceSheetInput struct {
-	SocietyID    int `json:"societyId"`
-	ActiveUserID int `json:"activeUserId"`
+	SocietyID int   `json:"societyId"`
+	AsOnDate  int64 `json:"asOnDate"`
 }
 
-type GetLedgersInput struct {
-	SocietyID    int `json:"societyId"`
-	ActiveUserID int `json:"activeUserId"`
+type GetLedgersBalanceInput struct {
+	SocietyID int   `json:"societyId"`
+	AsOnDate  int64 `json:"asOnDate"`
 }
 
 type GetIncomeAndExpenditureInput struct {
-	SocietyID    int    `json:"societyId"`
-	ActiveUserID int    `json:"activeUserId"`
-	FromDate     string `json:"fromDate"`
-	ToDate       string `json:"toDate"`
+	SocietyID int   `json:"societyId"`
+	FromDate  int64 `json:"fromDate"`
+	ToDate    int64 `json:"toDate"`
 }
 
 func handleGetMemberByID(_ context.Context, _ *mcp.CallToolRequest, input GetMemberByIDInput) (*mcp.CallToolResult, any, error) {
@@ -66,14 +64,12 @@ func handleGetMembers(_ context.Context, _ *mcp.CallToolRequest, input GetMember
 }
 
 func handleGetBalanceSheet(_ context.Context, _ *mcp.CallToolRequest, input GetBalanceSheetInput) (*mcp.CallToolResult, any, error) {
-	asOn, asOnDate := currentAsOn(time.Now())
-
-	body, err := getBalanceSheet(input.SocietyID, input.ActiveUserID, asOn)
+	body, err := getBalanceSheet(input.SocietyID, input.AsOnDate)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	result, err := buildGetBalanceSheetResponse(input.SocietyID, asOnDate, body)
+	result, err := buildGetBalanceSheetResponse(input.SocietyID, input.AsOnDate, body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -81,13 +77,13 @@ func handleGetBalanceSheet(_ context.Context, _ *mcp.CallToolRequest, input GetB
 	return jsonResult(result)
 }
 
-func handleGetLedgers(_ context.Context, _ *mcp.CallToolRequest, input GetLedgersInput) (*mcp.CallToolResult, any, error) {
-	body, err := getLedgers(input.SocietyID, input.ActiveUserID)
+func handleGetLedgersBalance(_ context.Context, _ *mcp.CallToolRequest, input GetLedgersBalanceInput) (*mcp.CallToolResult, any, error) {
+	body, err := getLedgersBalance(input.SocietyID, input.AsOnDate)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	result, err := buildGetLedgersResponse(input.SocietyID, body)
+	result, err := buildGetLedgersBalanceResponse(input.SocietyID, body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -96,20 +92,11 @@ func handleGetLedgers(_ context.Context, _ *mcp.CallToolRequest, input GetLedger
 }
 
 func handleGetIncomeAndExpenditure(_ context.Context, _ *mcp.CallToolRequest, input GetIncomeAndExpenditureInput) (*mcp.CallToolResult, any, error) {
-	startDate, err := dateUnixMillis(input.FromDate)
-	if err != nil {
-		return nil, nil, err
-	}
-	endDate, err := dateUnixMillis(input.ToDate)
-	if err != nil {
-		return nil, nil, err
-	}
-	if endDate < startDate {
+	if input.ToDate < input.FromDate {
 		return nil, nil, fmt.Errorf("toDate must be on or after fromDate")
 	}
-	endDate += int64(24*time.Hour/time.Millisecond) - 1
 
-	body, err := getIncomeAndExpenditure(input.SocietyID, input.ActiveUserID, startDate, endDate)
+	body, err := getIncomeAndExpenditure(input.SocietyID, input.FromDate, input.ToDate)
 	if err != nil {
 		return nil, nil, err
 	}

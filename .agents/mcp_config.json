@@ -1,0 +1,10 @@
+
+{
+  "mcpServers": {
+    "neighbium": {
+      "command": "/usr/local/go/bin/go",
+      "args": ["run", "."],
+      "cwd": "/Users/samriddhibharadwaj/Documents/School/neighbium-mcp"
+    }
+  }
+}
